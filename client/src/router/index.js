@@ -10,7 +10,6 @@ Vue.use(Router)
 
 export default new Router({
 	mode: 'history',
-  base: 'sehatyuk-spa/',
   linkExactActiveClass: 'is-active',
   routes: [
     {

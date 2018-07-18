@@ -32,7 +32,7 @@
 				<div class="column is-10 is-offset-1">
 					<div class="field">
 						<div class="control has-icons-right">
-							<input class="input" type="text" v-model="query" placeholder="Cari nama puskesmas disini..." @input="fetchData">
+							<input class="input" type="text" v-model="query" placeholder="Cari nama puskesmas disini..." @input="fetchData()">
 							<span class="icon is-small is-right">
 								<i class="fas fa-search"></i>
 							</span>
@@ -52,7 +52,7 @@
 					</div>
 					<!-- Akhir Puskesmas Tidak Ditemukan -->
 
-					<article class="message is-danger" v-for="(puskesmas, index) in newPuskesmases" v-if="!loading && newPuskesmases && found">
+					<article class="message is-danger" v-for="(puskesmas, index) in pagPuskesmases.data" v-if="!loading && newPuskesmases && found">
 						<div class="message-header">
 							<p>{{ puskesmas.nama_Puskesmas }}</p>
 						</div>
@@ -70,6 +70,10 @@
 							</div>
 						</div>
 					</article>
+
+					<div class="has-text-centered" v-if="nextPage">
+						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
+					</div>
 				</div>
 			</div>
 		</section>
@@ -160,7 +164,9 @@ export default {
 	data: () => ({
 		puskesmases: [],
 		newPuskesmases: [],
+		pagPuskesmases: [],
 		puskesmas: {},
+		nextPage: '',
 		count: '',
 		query: '',
 		found: '',
@@ -190,7 +196,7 @@ export default {
 		},
 
 		// Membuat array baru untuk membuat fitur 'cari'
-		fetchData () {
+		fetchData (url) {
 			this.loading = true
 
 			this.newPuskesmases = []
@@ -209,6 +215,33 @@ export default {
 			}
 
 			this.loading = false
+
+			if (url) {
+				let res = this.paginator(this.newPuskesmases, url, 5)
+				this.pagPuskesmases.data.push(...res.data)
+				this.nextPage = res.nextPage
+
+			} else {
+				this.pagPuskesmases = this.paginator(this.newPuskesmases, 1, 5)
+				this.nextPage = this.pagPuskesmases.nextPage
+			}
+		},
+
+		paginator (arr, page, perPage)
+		{
+			const offset = (page - 1) * perPage
+			const totalPage = Math.ceil(arr.length / perPage)
+			const data = arr.slice(offset, offset + perPage)
+
+			return {
+				page: page,
+				perPage: perPage,
+				prevPage: page - 1 ? page - 1 : null,
+				nextPage: (totalPage > page) ? page + 1 : null,
+				total: arr.length,
+				totalPage: totalPage,
+				data: data
+			}
 		},
 
 		// Mengambil data 1 puskesmas dari cURL
