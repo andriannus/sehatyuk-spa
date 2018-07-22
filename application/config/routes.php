@@ -53,4 +53,7 @@ $route['default_controller'] = 'site';
 $route['404_override'] = '';
 $route['translate_uri_dashes'] = FALSE;
 
-$route['(:any)'] = "site/index";
+$route['api/getPuskesmas'] = 'api/getPuskesmas';
+$route['api/getRumahSakitUmum'] = 'api/getRumahSakitUmum';
+$route['api/getRumahSakitKhusus'] = 'api/getRumahSakitKhusus';
+$route['(.*)'] = "site/index";
