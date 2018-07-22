@@ -52,105 +52,83 @@
 					</div>
 					<!-- Akhir Puskesmas Tidak Ditemukan -->
 
-					<article class="message is-danger" v-for="(puskesmas, index) in pagPuskesmases.data" v-if="!loading && newPuskesmases && found">
-						<div class="message-header">
-							<p>{{ puskesmas.nama_Puskesmas }}</p>
+					<b-collapse
+						class="card"
+						:open="isOpen"
+						v-for="(puskesmas, index) in pagPuskesmases.data"
+						:key="puskesmas.id"
+						v-if="!loading && newPuskesmases && found"
+					>
+						<div slot="trigger" slot-scope="props" class="card-header">
+							<p class="card-header-title">
+								{{ puskesmas.nama_Puskesmas }}
+							</p>
+							<a class="card-header-icon">
+								<b-icon
+									class="has-text-danger"
+									pack="fas"
+									:icon="props.open ? 'caret-down' : 'caret-up'"
+								></b-icon>
+							</a>
 						</div>
-						<div class="message-body">
+
+						<div class="card-content">
 							<div class="field">
 								<label class="label">Alamat</label>
 								<div class="control">
-									<span>{{ puskesmas.location.alamat }}</span>
+									<p>{{ puskesmas.location.alamat }}</p>
+									<span>
+										<button class="button is-danger" @click="showMap">Lihat Peta</button>
+									</span>
 								</div>
 							</div>
+
 							<div class="field">
+								<label class="label">Kepala Puskesmas</label>
 								<div class="control">
-									<button class="button is-danger" @click="getPuskesmas(puskesmas.id)">Lihat</button>
+									<span>{{ puskesmas.kepala_puskesmas }}</span>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Telepon</label>
+								<div class="control">
+									<span v-if="puskesmas.telepon[0] === ''">-</span>
+
+									<div class="tags" v-if="puskesmas.telepon[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in puskesmas.telepon">{{ t }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Fax</label>
+								<div class="control">
+									<span v-if="puskesmas.faximile[0] === ''">-</span>
+									
+									<div class="tags" v-if="puskesmas.faximile[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in puskesmas.faximile">{{ f }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Email</label>
+								<div class="control">
+									<span v-if="!puskesmas.email">-</span>
+									
+									<span v-if="puskesmas.email">{{ puskesmas.email }}</span>
 								</div>
 							</div>
 						</div>
-					</article>
+					</b-collapse>
 
-					<div class="has-text-centered" v-if="nextPage">
+					<div class="has-text-centered m-t-10" v-if="nextPage">
 						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
 					</div>
 				</div>
 			</div>
 		</section>
-
-		<!-- Modal Detail Puskesmas -->
-		<b-modal :active.sync="visibleModal" :width="640">
-			<div class="card">
-				<header class="card-header">
-					<p class="card-header-title">Detail Puskesmas</p>
-				</header>
-
-				<!-- Memuat Detail Puskesmas -->
-				<section class="card-content has-text-centered" v-if="loadingPuskesmas">
-					<i class="fas fa-spin fa-spinner title"></i>
-					<p class="subtitle">Memuat data...</p>
-				</section>
-				<!-- Akhir Memuat Detail Puskesmas -->
-
-				<section class="card-content" v-if="!loadingPuskesmas">
-					<div class="field">
-						<label class="label">Nama Puskesmas</label>
-						<div class="control">
-							<p>{{ puskesmas.nama_Puskesmas }}</p>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Alamat</label>
-						<div class="control">
-							<p>{{ puskesmas.location.alamat }}</p>
-							<span>
-								<button class="button is-danger" @click="showMap">Lihat Peta</button>
-							</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Kepala Puskesmas</label>
-						<div class="control">
-							<span>{{ puskesmas.kepala_puskesmas }}</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Telepon</label>
-						<div class="control">
-							<span v-if="puskesmas.telepon[0] === ''">-</span>
-
-							<div class="tags" v-if="puskesmas.telepon[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in puskesmas.telepon">{{ t }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Fax</label>
-						<div class="control">
-							<span v-if="puskesmas.faximile[0] === ''">-</span>
-							
-							<div class="tags" v-if="puskesmas.faximile[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in puskesmas.faximile">{{ f }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Email</label>
-						<div class="control">
-							<span v-if="!puskesmas.email">-</span>
-							
-							<span v-if="puskesmas.email">{{ puskesmas.email }}</span>
-						</div>
-					</div>
-				</section>
-			</div>
-		</b-modal>
-		<!-- Akhir Modal Detail Puskesmas -->
 	</div>
 </template>
 
@@ -170,9 +148,8 @@ export default {
 		count: '',
 		query: '',
 		found: '',
-		visibleModal: false,
-		loading: true,
-		loadingPuskesmas: true
+		isOpen: false,
+		loading: true
 	}),
 
 	mounted() {
@@ -196,7 +173,7 @@ export default {
 		},
 
 		// Membuat array baru untuk membuat fitur 'cari'
-		fetchData (url) {
+		fetchData (page) {
 			this.loading = true
 
 			this.newPuskesmases = []
@@ -216,8 +193,8 @@ export default {
 
 			this.loading = false
 
-			if (url) {
-				let res = this.paginator(this.newPuskesmases, url, 5)
+			if (page) {
+				let res = this.paginator(this.newPuskesmases, page, 5)
 				this.pagPuskesmases.data.push(...res.data)
 				this.nextPage = res.nextPage
 
@@ -227,6 +204,7 @@ export default {
 			}
 		},
 
+		// Membuat Pagination
 		paginator (arr, page, perPage)
 		{
 			const offset = (page - 1) * perPage
@@ -244,32 +222,11 @@ export default {
 			}
 		},
 
-		// Mengambil data 1 puskesmas dari cURL
-		getPuskesmas (id) {
-			this.switchModal()
-
-			this.axios.get('getPuskesmas?id=' + id)
-				.then(res => {
-					this.puskesmas = res.data.data[0]
-					this.loadingPuskesmas = false
-				})
-
-				.catch(err => {
-					alert('Terjadi error. Silahkan refresh halaman atau coba lagi nanti.')
-				})
-		},
-
 		// Menampilkan Google Maps pada tab browser yang baru
 		showMap () {
 			let center = this.puskesmas.location.latitude + ',' + this.puskesmas.location.longitude
 			let url = 'https://www.google.com/maps/search/?api=1&query=' + center
 			window.open(url, '_blank')
-		},
-
-		// Mengaktifkan atau menonaktifkan 'modal'
-		switchModal () {
-			this.visibleModal = !this.visibleModal
-			this.loadingPuskesmas = true
 		}
 	}
 }
@@ -278,5 +235,9 @@ export default {
 <style>
 .m-t-52 {
 	margin-top: 52px;
+}
+
+.m-t-10 {
+	margin-top: 10px;
 }
 </style>
