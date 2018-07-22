@@ -1,31 +1,22 @@
 <template>
 	<div>
+		<!-- Tampilan Loading -->
+		<b-loading :is-full-page="isFullPage" :active="loading"></b-loading>
+		<!-- Akhir Tampilan Loading -->
+
 		<!-- Header -->
-		<section class="hero is-danger is-bold m-t-52">
+		<section class="hero is-success is-bold m-t-52">
 			<div class="hero-body">
 				<div class="container">
 					<h1 class="title">
 						Daftar Rumah Sakit Khusus
 					</h1>
 
-					<!-- Memuat Total RS Khusus -->
-					<p class="subtitle" v-if="loading">
-						<i class="fas fa-spin fa-spinner title"></i>
-					</p>
-					<!-- Akhir Memuat Total RS Khusus -->
-
 					<p class="subtitle" v-if="!loading">Ada {{ count }} RS Khusus di DKI Jakarta</p>
 				</div>
 			</div>
 		</section>
 		<!-- Akhir Header -->
-
-		<!-- Memuat Data RS Khusus -->
-		<section class="section has-text-centered" v-if="loading">
-			<i class="fas fa-spin fa-spinner title"></i>
-			<p class="subtitle">Memuat data...</p>
-		</section>
-		<!-- Akhir Memuat Data RS Khusus -->
 
 		<section class="section" v-if="!loading">
 			<div class="columns is-mobile">
@@ -69,7 +60,7 @@
 							</p>
 							<a class="card-header-icon">
 								<b-icon
-									class="has-text-danger"
+									class="has-text-success"
 									pack="fas"
 									:icon="props.open ? 'caret-down' : 'caret-up'"
 								></b-icon>
@@ -89,7 +80,7 @@
 								<div class="control">
 									<p>{{ rsk.location.alamat }}</p>
 									<span>
-										<button class="button is-danger" @click="showMap">Lihat Peta</button>
+										<button class="button is-success" @click="showMap">Lihat Peta</button>
 									</span>
 								</div>
 							</div>
@@ -98,7 +89,7 @@
 								<label class="label">Website</label>
 								<div class="control">
 									<span v-if="!rsk.website">-</span>
-									<a :href="'http://' + rsk.website" class="has-text-danger" v-if="rsk.website" target="_blank">{{ rsk.website }}</a>
+									<a :href="'http://' + rsk.website" class="has-text-success" v-if="rsk.website" target="_blank">{{ rsk.website }}</a>
 								</div>
 							</div>
 
@@ -108,7 +99,7 @@
 									<span v-if="rsk.telepon[0] === ''">-</span>
 
 									<div class="tags" v-if="rsk.telepon[0] != ''">
-										<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in rsk.telepon">{{ t }}</span>
+										<span class="tag is-medium is-success is-rounded" v-for="(t, index) in rsk.telepon">{{ t }}</span>
 									</div>
 								</div>
 							</div>
@@ -119,7 +110,7 @@
 									<span v-if="rsk.faximile[0] === ''">-</span>
 									
 									<div class="tags" v-if="rsk.faximile[0] != ''">
-										<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in rsk.faximile">{{ f }}</span>
+										<span class="tag is-medium is-success is-rounded" v-for="(f, index) in rsk.faximile">{{ f }}</span>
 									</div>
 								</div>
 							</div>
@@ -138,7 +129,7 @@
 
 					<!-- Pagination -->
 					<div class="has-text-centered m-t-10" v-if="nextPage">
-						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
+						<button class="button is-success" @click="fetchData(nextPage)">Lebih Banyak</button>
 					</div>
 					<!-- Akhir Pagination -->
 				</div>

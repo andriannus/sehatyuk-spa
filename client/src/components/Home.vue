@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<section class="hero is-danger is-fullheight">
+		<section class="hero is-success is-fullheight">
 			<div class="hero-body">
 				<div class="container has-text-centered">
 					<h1 class="title">
@@ -16,19 +16,19 @@
 						<div class="column is-6 is-offset-3">
 							<div class="columns">
 								<div class="column">
-									<router-link class="button is-danger is-inverted is-fullwidth" to="puskesmas">
+									<router-link class="button is-success is-inverted is-fullwidth" to="puskesmas">
 										Puskesmas
 									</router-link>
 								</div>
 
 								<div class="column">
-									<router-link class="button is-danger is-inverted is-fullwidth" to="rsk">
+									<router-link class="button is-success is-inverted is-fullwidth" to="rsk">
 										RS Khusus
 									</router-link>
 								</div>
 
 								<div class="column">
-									<router-link class="button is-danger is-inverted is-fullwidth" to="rsu">
+									<router-link class="button is-success is-inverted is-fullwidth" to="rsu">
 										RS Umum
 									</router-link>
 								</div>
