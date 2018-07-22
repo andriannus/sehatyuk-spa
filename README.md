@@ -1,5 +1,5 @@
 # Sehat Yuk
-Temukan instansi kesehatan di daerah DKI Jakarta (SPA)
+> Temukan instansi kesehatan di daerah DKI Jakarta (SPA)
 
 ## Apa yang Berbeda?
 1. Single Page Application!
@@ -23,18 +23,20 @@ Temukan instansi kesehatan di daerah DKI Jakarta (SPA)
 ## Mode Development
 1. Buka direktori `client` dan install package.json
 ```
-// sehatyuk-spa/client
+# sehatyuk-spa/client
+
 npm install
 npm run dev
 ```
-3. Buka file `index.js` pada direktori `src/router`
-4. Hapus `base`
+2. Buka file `index.js` pada direktori `src/router`
+3. Hapus `base`
 4. Silahkan Kunjungi `http://localhost:8080/`
 
 ## Mode Production (Default)
 1. Buka direktori `client` dan install package.json
 ```
-// sehatyuk-spa/client
+# sehatyuk-spa/client
+
 npm install
 npm run build
 ```
