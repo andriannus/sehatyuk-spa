@@ -30,6 +30,8 @@
 		<section class="section" v-if="!loading">
 			<div class="columns is-mobile">
 				<div class="column is-10 is-offset-1">
+
+					<!-- Pencarian -->
 					<div class="field">
 						<div class="control has-icons-right">
 							<input class="input" type="text" v-model="query" placeholder="Cari nama puskesmas disini..." @input="fetchData()">
@@ -38,7 +40,8 @@
 							</span>
 						</div>
 					</div>
-
+					<!-- Akhir Pencarian -->
+					
 					<hr>
 
 					<!-- Puskesmas Tidak Ditemukan -->
@@ -52,6 +55,7 @@
 					</div>
 					<!-- Akhir Puskesmas Tidak Ditemukan -->
 
+					<!-- Collapse Data Puskesmas -->
 					<b-collapse
 						class="card"
 						:open="isOpen"
@@ -122,10 +126,13 @@
 							</div>
 						</div>
 					</b-collapse>
+					<!-- Akhir Collapse Data Puskesmas -->
 
+					<!-- Pagination -->
 					<div class="has-text-centered m-t-10" v-if="nextPage">
 						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
 					</div>
+					<!-- Akhir Pagination -->
 				</div>
 			</div>
 		</section>

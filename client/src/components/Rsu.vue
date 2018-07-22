@@ -30,6 +30,8 @@
 		<section class="section" v-if="!loading">
 			<div class="columns is-mobile">
 				<div class="column is-10 is-offset-1">
+
+					<!-- Pencarian -->
 					<div class="field">
 						<div class="control has-icons-right">
 							<input class="input" type="text" v-model="query" placeholder="Cari nama RS disini..." @input="fetchData">
@@ -38,6 +40,7 @@
 							</span>
 						</div>
 					</div>
+					<!-- Akhir Pencarian -->
 
 					<hr>
 
@@ -52,109 +55,95 @@
 					</div>
 					<!-- Akhir RS Umum Tidak Ditemukan -->
 
-					<article class="message is-danger" v-for="(rsu, index) in newRsus" v-if="!loading">
-						<div class="message-header">
-							<p>RS {{ rsu.nama_rsu }}</p>
+					<!-- Collapse Data RSU -->
+					<b-collapse
+						class="card"
+						:open="isOpen"
+						v-for="(rsu, index) in pagRsus.data"
+						:key="rsu.id"
+						v-if="!loading && newRsus && found"
+					>
+						<div slot="trigger" slot-scope="props" class="card-header">
+							<p class="card-header-title">
+								RS {{ rsu.nama_rsu }}
+							</p>
+							<a class="card-header-icon">
+								<b-icon
+									class="has-text-danger"
+									pack="fas"
+									:icon="props.open ? 'caret-down' : 'caret-up'"
+								></b-icon>
+							</a>
 						</div>
-						<div class="message-body">
+
+						<div class="card-content">
+							<div class="field">
+								<label class="label">Jenis RS Umum</label>
+								<div class="control">
+									<span>{{ rsu.jenis_rsu }}</span>
+								</div>
+							</div>
+
 							<div class="field">
 								<label class="label">Alamat</label>
 								<div class="control">
-									<span>{{ rsu.location.alamat }}</span>
+									<p>{{ rsu.location.alamat }}</p>
+									<span>
+										<button class="button is-danger" @click="showMap">Lihat Peta</button>
+									</span>
 								</div>
 							</div>
+
 							<div class="field">
+								<label class="label">Website</label>
 								<div class="control">
-									<button class="button is-danger" @click="getRsu(rsu.id)">Lihat</button>
+									<span v-if="!rsu.website">-</span>
+									<a :href="'http://' + rsu.website" class="has-text-link" v-if="rsu.website" target="_blank">{{ rsu.website }}</a>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Telepon</label>
+								<div class="control">
+									<span v-if="rsu.telepon[0] === ''">-</span>
+
+									<div class="tags" v-if="rsu.telepon[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in rsu.telepon">{{ t }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Fax</label>
+								<div class="control">
+									<span v-if="rsu.faximile[0] === ''">-</span>
+									
+									<div class="tags" v-if="rsu.faximile[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in rsu.faximile">{{ f }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Email</label>
+								<div class="control">
+									<span v-if="!rsu.email">-</span>
+
+									<span v-if="rsu.email">{{ rsu.email }}</span>
 								</div>
 							</div>
 						</div>
-					</article>
+					</b-collapse>
+					<!-- Akhir Collapse Data RSU -->
+
+					<!-- Pagination -->
+					<div class="has-text-centered m-t-10" v-if="nextPage">
+						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
+					</div>
+					<!-- Akhir Pagination -->
 				</div>
 			</div>
 		</section>
-
-		<!-- Modal Detail RS Umum -->
-		<b-modal :active.sync="visibleModal" :width="640">
-			<div class="card">
-				<header class="card-header">
-					<p class="card-header-title">Detail RS Umum</p>
-				</header>
-
-				<!-- Memuat Detail RS Umum -->
-				<section class="card-content has-text-centered" v-if="loadingRsu">
-					<i class="fas fa-spin fa-spinner title"></i>
-					<p class="subtitle">Memuat data...</p>
-				</section>
-				<!-- Akhir Memuat Detail RS Umum -->
-
-				<section class="card-content" v-if="!loadingRsu">
-					<div class="field">
-						<label class="label">Nama RS Umum</label>
-						<div class="control">
-							<p>RS {{ rsu.nama_rsu }}</p>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Jenis RS Umum</label>
-						<div class="control">
-							<span>{{ rsu.jenis_rsu }}</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Alamat</label>
-						<div class="control">
-							<p>{{ rsu.location.alamat }}</p>
-							<span>
-								<button class="button is-danger" @click="showMap">Lihat Peta</button>
-							</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Website</label>
-						<div class="control">
-							<span v-if="!rsu.website">-</span>
-							<a :href="'http://' + rsu.website" class="has-text-link" v-if="rsu.website" target="_blank">{{ rsu.website }}</a>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Telepon</label>
-						<div class="control">
-							<span v-if="rsu.telepon[0] === ''">-</span>
-
-							<div class="tags" v-if="rsu.telepon[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in rsu.telepon">{{ t }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Fax</label>
-						<div class="control">
-							<span v-if="rsu.faximile[0] === ''">-</span>
-							
-							<div class="tags" v-if="rsu.faximile[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in rsu.faximile">{{ f }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Email</label>
-						<div class="control">
-							<span v-if="!rsu.email">-</span>
-
-							<span v-if="rsu.email">{{ rsu.email }}</span>
-						</div>
-					</div>
-				</section>
-			</div>
-		</b-modal>
-		<!-- Akhir Modal Detail RS Umum -->
 	</div>
 </template>
 
@@ -168,13 +157,14 @@ export default {
 	data: () => ({
 		rsus: [],
 		newRsus: [],
+		pagRsus: [],
 		rsu: {},
+		nextPage: '',
 		count: '',
 		query: '',
 		found: '',
-		visibleModal: false,
-		loading: true,
-		loadingRsu: true
+		isOpen: false,
+		loading: true
 	}),
 
 	mounted() {
@@ -182,6 +172,7 @@ export default {
 	},
 
 	methods: {
+		// Mengambil data seluruh RSU dari cURL
 		getData () {
 			this.axios.get('getRumahSakitUmum')
 				.then(res => {
@@ -196,7 +187,8 @@ export default {
 				})
 		},
 
-		fetchData () {
+		// Membuat array baru untuk membuat fitur 'cari'
+		fetchData (page) {
 			this.loading = true
 
 			this.newRsus = []
@@ -215,21 +207,34 @@ export default {
 			}
 
 			this.loading = false
+
+			if (page) {
+				let res = this.paginator(this.newRsus, page, 5)
+				this.pagRsus.data.push(...res.data)
+				this.nextPage = res.nextPage
+
+			} else {
+				this.pagRsus = this.paginator(this.newRsus, 1, 5)
+				this.nextPage = this.pagRsus.nextPage
+			}
 		},
 
-		// Mengambil data 1 RSU dari cURL
-		getRsu (id) {
-			this.switchModal()
+		// Membuat Pagination
+		paginator (arr, page, perPage)
+		{
+			const offset = (page - 1) * perPage
+			const totalPage = Math.ceil(arr.length / perPage)
+			const data = arr.slice(offset, offset + perPage)
 
-			this.axios.get('getRumahSakitUmum?id=' + id)
-				.then(res => {
-					this.rsu = res.data.data[0]
-					this.loadingRsu = false
-				})
-
-				.catch(err => {
-					alert('Terjadi error. Silahkan refresh halaman atau coba lagi nanti.')
-				})
+			return {
+				page: page,
+				perPage: perPage,
+				prevPage: page - 1 ? page - 1 : null,
+				nextPage: (totalPage > page) ? page + 1 : null,
+				total: arr.length,
+				totalPage: totalPage,
+				data: data
+			}
 		},
 
 		// Menampilkan Google Maps pada tab browser yang baru
@@ -237,17 +242,17 @@ export default {
 			let center = this.rsu.latitude + ',' + this.rsu.longitude
 			let url = 'https://www.google.com/maps/search/?api=1&query=' + center
 			window.open(url, '_blank')
-		},
-
-		// Mengaktifkan atau menonaktifkan 'modal'
-		switchModal () {
-			this.visibleModal = !this.visibleModal
-			this.loadingRsu = true
 		}
 	}
 }
 </script>
 
 <style>
+.m-t-52 {
+	margin-top: 52px;
+}
 
+.m-t-10 {
+	margin-top: 10px;
+}
 </style>

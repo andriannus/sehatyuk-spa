@@ -30,6 +30,8 @@
 		<section class="section" v-if="!loading">
 			<div class="columns is-mobile">
 				<div class="column is-10 is-offset-1">
+
+					<!-- Pencarian -->
 					<div class="field">
 						<div class="control has-icons-right">
 							<input class="input" type="text" v-model="query" placeholder="Cari nama RS disini..." @input="fetchData">
@@ -38,6 +40,7 @@
 							</span>
 						</div>
 					</div>
+					<!-- Akhir Pencarian -->
 
 					<hr>
 
@@ -52,109 +55,95 @@
 					</div>
 					<!-- Akhir RS Khusus Tidak Ditemukan -->
 
-					<article class="message is-danger" v-for="(rsk, index) in newRsks" v-if="!loading && found">
-						<div class="message-header">
-							<p>RS {{ rsk.nama_rsk }}</p>
+					<!-- Collapse Data RSK -->
+					<b-collapse
+						class="card"
+						:open="isOpen"
+						v-for="(rsk, index) in pagRsks.data"
+						:key="rsk.id"
+						v-if="!loading && newRsks && found"
+					>
+						<div slot="trigger" slot-scope="props" class="card-header">
+							<p class="card-header-title">
+								RS {{ rsk.nama_rsk }}
+							</p>
+							<a class="card-header-icon">
+								<b-icon
+									class="has-text-danger"
+									pack="fas"
+									:icon="props.open ? 'caret-down' : 'caret-up'"
+								></b-icon>
+							</a>
 						</div>
-						<div class="message-body">
+
+						<div class="card-content">
+							<div class="field">
+								<label class="label">Jenis RS Khusus</label>
+								<div class="control">
+									<span>{{ rsk.jenis_rsk }}</span>
+								</div>
+							</div>
+
 							<div class="field">
 								<label class="label">Alamat</label>
 								<div class="control">
-									<span>{{ rsk.location.alamat }}</span>
+									<p>{{ rsk.location.alamat }}</p>
+									<span>
+										<button class="button is-danger" @click="showMap">Lihat Peta</button>
+									</span>
 								</div>
 							</div>
+
 							<div class="field">
+								<label class="label">Website</label>
 								<div class="control">
-									<button class="button is-danger" @click="getRsk(rsk.id)">Lihat</button>
+									<span v-if="!rsk.website">-</span>
+									<a :href="'http://' + rsk.website" class="has-text-danger" v-if="rsk.website" target="_blank">{{ rsk.website }}</a>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Telepon</label>
+								<div class="control">
+									<span v-if="rsk.telepon[0] === ''">-</span>
+
+									<div class="tags" v-if="rsk.telepon[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in rsk.telepon">{{ t }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Fax</label>
+								<div class="control">
+									<span v-if="rsk.faximile[0] === ''">-</span>
+									
+									<div class="tags" v-if="rsk.faximile[0] != ''">
+										<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in rsk.faximile">{{ f }}</span>
+									</div>
+								</div>
+							</div>
+
+							<div class="field">
+								<label class="label">Email</label>
+								<div class="control">
+									<span v-if="!rsk.email">-</span>
+
+									<span v-if="rsk.email">{{ rsk.email }}</span>
 								</div>
 							</div>
 						</div>
-					</article>
+					</b-collapse>
+					<!-- Akhir Collapse Data RSK -->
+
+					<!-- Pagination -->
+					<div class="has-text-centered m-t-10" v-if="nextPage">
+						<button class="button is-danger" @click="fetchData(nextPage)">Lebih Banyak</button>
+					</div>
+					<!-- Akhir Pagination -->
 				</div>
 			</div>
 		</section>
-
-		<!-- Modal Detail RS Khusus -->
-		<b-modal :active.sync="visibleModal" :width="640">
-			<div class="card">
-				<header class="card-header">
-					<p class="card-header-title">Detail RS Khusus</p>
-				</header>
-
-				<!-- Memuat Detail RS Khusus -->
-				<section class="card-content has-text-centered" v-if="loadingRsk">
-					<i class="fas fa-spin fa-spinner title"></i>
-					<p class="subtitle">Memuat data...</p>
-				</section>
-				<!-- Akhir Memuat Detail RS Khusus -->
-
-				<section class="card-content" v-if="!loadingRsk">
-					<div class="field">
-						<label class="label">Nama RS Khusus</label>
-						<div class="control">
-							<p>RS {{ rsk.nama_rsk }}</p>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Jenis RS Khusus</label>
-						<div class="control">
-							<span>{{ rsk.jenis_rsk }}</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Alamat</label>
-						<div class="control">
-							<p>{{ rsk.location.alamat }}</p>
-							<span>
-								<button class="button is-danger" @click="showMap">Lihat Peta</button>
-							</span>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Website</label>
-						<div class="control">
-							<span v-if="!rsk.website">-</span>
-							<a :href="'http://' + rsk.website" class="has-text-link" v-if="rsk.website" target="_blank">{{ rsk.website }}</a>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Telepon</label>
-						<div class="control">
-							<span v-if="rsk.telepon[0] === ''">-</span>
-
-							<div class="tags" v-if="rsk.telepon[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(t, index) in rsk.telepon">{{ t }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Fax</label>
-						<div class="control">
-							<span v-if="rsk.faximile[0] === ''">-</span>
-							
-							<div class="tags" v-if="rsk.faximile[0] != ''">
-								<span class="tag is-medium is-danger is-rounded" v-for="(f, index) in rsk.faximile">{{ f }}</span>
-							</div>
-						</div>
-					</div>
-
-					<div class="field">
-						<label class="label">Email</label>
-						<div class="control">
-							<span v-if="!rsk.email">-</span>
-
-							<span v-if="rsk.email">{{ rsk.email }}</span>
-						</div>
-					</div>
-				</section>
-			</div>
-		</b-modal>
-		<!-- Akhir Modal Detail RS Khusus -->
 	</div>
 </template>
 
@@ -168,13 +157,14 @@ export default {
 	data: () => ({
 		rsks: [],
 		newRsks: [],
+		pagRsks: [],
 		rsk: {},
+		nextPage: '',
 		count: '',
 		query: '',
 		found: '',
-		visibleModal: false,
-		loading: true,
-		loadingRsk: true
+		isOpen: false,
+		loading: true
 	}),
 
 	mounted() {
@@ -198,7 +188,7 @@ export default {
 		},
 
 		// Membuat array baru untuk membuat fitur 'cari'
-		fetchData () {
+		fetchData (page) {
 			this.loading = true
 
 			this.newRsks = []
@@ -217,21 +207,34 @@ export default {
 			}
 
 			this.loading = false
+
+			if (page) {
+				let res = this.paginator(this.newRsks, page, 5)
+				this.pagRsks.data.push(...res.data)
+				this.nextPage = res.nextPage
+
+			} else {
+				this.pagRsks = this.paginator(this.newRsks, 1, 5)
+				this.nextPage = this.pagRsks.nextPage
+			}
 		},
 
-		// Mengambil data 1 RSK dari cURL
-		getRsk (id) {
-			this.switchModal()
+		// Membuat Pagination
+		paginator (arr, page, perPage)
+		{
+			const offset = (page - 1) * perPage
+			const totalPage = Math.ceil(arr.length / perPage)
+			const data = arr.slice(offset, offset + perPage)
 
-			this.axios.get('getRumahSakitKhusus?id=' + id)
-				.then(res => {
-					this.rsk = res.data.data[0]
-					this.loadingRsk = false
-				})
-
-				.catch(err => {
-					alert('Terjadi error. Silahkan refresh halaman atau coba lagi nanti.')
-				})
+			return {
+				page: page,
+				perPage: perPage,
+				prevPage: page - 1 ? page - 1 : null,
+				nextPage: (totalPage > page) ? page + 1 : null,
+				total: arr.length,
+				totalPage: totalPage,
+				data: data
+			}
 		},
 
 		// Menampilkan Google Maps pada tab browser yang baru
@@ -240,12 +243,6 @@ export default {
 			let url = 'https://www.google.com/maps/search/?api=1&query=' + center
 			window.open(url, '_blank')
 		},
-
-		// Mengaktifkan atau menonaktifkan 'modal'
-		switchModal () {
-			this.visibleModal = !this.visibleModal
-			this.loadingRsk = true
-		}
 	}
 }
 </script>
@@ -253,5 +250,9 @@ export default {
 <style>
 .m-t-52 {
 	margin-top: 52px;
+}
+
+.m-t-10 {
+	margin-top: 10px;
 }
 </style>
