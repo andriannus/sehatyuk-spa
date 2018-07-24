@@ -24,7 +24,7 @@
 					<!-- Pencarian -->
 					<div class="field">
 						<div class="control has-icons-right">
-							<input class="input" type="text" v-model="query" placeholder="Cari nama RS disini..." @input="fetchData">
+							<input class="input" type="text" v-model="query" placeholder="Cari nama RS disini..." @input="fetchData()">
 							<span class="icon is-small is-right">
 								<i class="fas fa-search"></i>
 							</span>
@@ -79,7 +79,7 @@
 								<div class="control">
 									<p>{{ rsu.location.alamat }}</p>
 									<span>
-										<button class="button is-success" @click="showMap">Lihat Peta</button>
+										<button class="button is-success" @click="showMap(index)">Tampilkan Peta</button>
 									</span>
 								</div>
 							</div>
@@ -134,6 +134,16 @@
 				</div>
 			</div>
 		</section>
+
+		<div class="modal maps" :class="{ 'is-active': isActive }">
+			<div class="modal-background"></div>
+			<div class="modal-card">
+				 <section class="modal-card-body maps-card">
+				 	<div ref="map" style="height: 100%"></div>
+				 </section>
+			</div>
+			<button class="modal-close is-large" aria-label="close" @click="isActive = false"></button>
+		</div>
 	</div>
 </template>
 
@@ -154,6 +164,8 @@ export default {
 		query: '',
 		found: '',
 		isOpen: false,
+		isActive: false,
+		isFullPage: true,
 		loading: true
 	}),
 
@@ -227,11 +239,25 @@ export default {
 			}
 		},
 
-		// Menampilkan Google Maps pada tab browser yang baru
-		showMap () {
-			let center = this.rsu.latitude + ',' + this.rsu.longitude
-			let url = 'https://www.google.com/maps/search/?api=1&query=' + center
-			window.open(url, '_blank')
+		// Menampilkan Peta
+		showMap (index) {
+			const lat = this.rsus[index].location.latitude
+			const lng = this.rsus[index].location.longitude
+
+			const latLng = new google.maps.LatLng(lat, lng)
+
+			const map = new google.maps.Map(this.$refs.map, {
+				center: latLng,
+				zoom: 19,
+				disableDefaultUI: true
+			});
+
+			const marker = new google.maps.Marker({
+				position: latLng,
+				map: map
+			})
+
+			this.isActive = true
 		}
 	}
 }
@@ -244,5 +270,13 @@ export default {
 
 .m-t-10 {
 	margin-top: 10px;
+}
+
+.maps {
+	z-index: 1010;
+}
+
+.maps-card {
+	height: 75vh;
 }
 </style>
