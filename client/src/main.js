@@ -9,6 +9,7 @@ import BackToTop from 'vue-backtotop'
 import App from './App'
 import router from './router'
 
+import 'vue2-animate/dist/vue2-animate.min.css'
 import 'buefy/lib/buefy.css'
 
 Vue.use(VueAxios, axios)
