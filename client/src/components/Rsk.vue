@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div id="rsk">
 		<!-- Tampilan Loading -->
 		<b-loading :is-full-page="isFullPage" :active="loading"></b-loading>
 		<!-- Akhir Tampilan Loading -->
@@ -78,9 +78,13 @@
 							<div class="field">
 								<label class="label">Alamat</label>
 								<div class="control">
-									<p>{{ rsk.location.alamat }}</p>
 									<span>
-										<button class="button is-success" @click="showMap(index)">Tampilkan Peta</button>
+										<button class="button is-success" @click="showMap(index)">
+											<span>Tampilkan Peta</span>
+											<span class="icon">
+												<i class="fas fa-eye"></i>
+											</span>
+										</button>
 									</span>
 								</div>
 							</div>
@@ -136,15 +140,25 @@
 			</div>
 		</section>
 
-		<div class="modal maps" :class="{ 'is-active': isActive }">
+		<div class="modal maps" :class="{ 'is-active': isActive }" v-if="placeId">
 			<div class="modal-background"></div>
 			<div class="modal-card">
 				 <section class="modal-card-body maps-card">
-				 	<div ref="map" style="height: 100%"></div>
+				 	<iframe
+				 		width="100%" height="100%" frameborder="0" style="border:0"
+				 		:src="'https://www.google.com/maps/embed/v1/place?q=place_id:' + placeId + '&key=AIzaSyBru3kP1mWUB_iF2okk_H3bDH3-ImcG4hc'"
+				 		allowfullscreen
+				 	></iframe>
 				 </section>
 			</div>
-			<button class="modal-close is-large" aria-label="close" @click="isActive = false"></button>
+			<button class="modal-close is-large" aria-label="close" @click="reset"></button>
 		</div>
+
+		<back-to-top visibleoffset="800" bottom="50px" right="50px" v-if="!isActive">
+			<button class="button is-dark is-large">
+				<i class="fas fa-chevron-circle-up"></i>
+			</button>
+		</back-to-top>
 	</div>
 </template>
 
@@ -160,6 +174,7 @@ export default {
 		newRsks: [],
 		pagRsks: [],
 		rsk: {},
+		placeId: '',
 		nextPage: '',
 		count: '',
 		query: '',
@@ -242,29 +257,46 @@ export default {
 
 		// Menampilkan Peta
 		showMap (index) {
+			const app = this.$parent.$children[1]
+			const geocoder = new google.maps.Geocoder
+
 			const lat = this.rsks[index].location.latitude
 			const lng = this.rsks[index].location.longitude
 
-			const latLng = new google.maps.LatLng(lat, lng)
+			const latLng = {
+				lat: lat,
+				lng: lng
+			}
 
-			const map = new google.maps.Map(this.$refs.map, {
-				center: latLng,
-				zoom: 19,
-				disableDefaultUI: true
-			});
+			geocoder.geocode({ 'location': latLng }, function (results, status) {
+				if (status !== 'OK') {
+					alert('Terjadi error. Silahkan refresh halaman')
+				}
 
-			const marker = new google.maps.Marker({
-				position: latLng,
-				map: map
+				app.placeId = results[0].place_id
+				app.isActive = true
 			})
 
-			this.isActive = true
+			this.$snackbar.open({
+				type: 'is-danger',
+				message: 'Lokasi peta mungkin tidak akurat. Silahkan cek kembali',
+				duration: 5000
+			})
+		},
+
+		reset () {
+			this.placeId = ''
+			this.isActive = false
 		}
 	}
 }
 </script>
 
 <style>
+#rsk {
+	min-height: 92vh;
+}
+
 .m-t-52 {
 	margin-top: 52px;
 }
@@ -274,10 +306,11 @@ export default {
 }
 
 .maps {
-	z-index: 1010;
+	z-index: 1000;
 }
 
 .maps-card {
 	height: 75vh;
+	overflow: hidden;
 }
 </style>
