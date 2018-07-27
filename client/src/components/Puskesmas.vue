@@ -124,7 +124,7 @@
 					<!-- Akhir Collapse Data Puskesmas -->
 
 					<!-- Pagination -->
-					<div class="has-text-centered m-t-10" v-if="nextPage">
+					<div class="has-text-centered m-t-20" v-if="nextPage">
 						<button class="button is-success" @click="fetchData(nextPage)">Lebih Banyak</button>
 					</div>
 					<!-- Akhir Pagination -->
@@ -133,7 +133,7 @@
 		</section>
 
 		<div class="modal maps" :class="{ 'is-active': isActive }" v-if="placeId">
-			<div class="modal-background"></div>
+			<div class="modal-background" @click="reset"></div>
 			<div class="modal-card">
 				 <section class="modal-card-body maps-card">
 				 	<iframe
@@ -294,8 +294,8 @@ export default {
 	margin-top: 52px;
 }
 
-.m-t-10 {
-	margin-top: 10px;
+.m-t-20 {
+	margin-top: 20px;
 }
 
 .maps {
@@ -305,5 +305,9 @@ export default {
 .maps-card {
 	height: 75vh;
 	overflow: hidden;
+}
+
+.card-content {
+	word-break: break-all;
 }
 </style>
